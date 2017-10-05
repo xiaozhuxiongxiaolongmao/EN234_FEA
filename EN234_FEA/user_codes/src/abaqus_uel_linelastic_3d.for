@@ -1,5 +1,5 @@
 !
-!    ABAQUS format UEL_3d subroutine
+!    ABAQUS format UEL subroutine
 !
 !    This file is compatible with both EN234_FEA and ABAQUS/Standard
 !

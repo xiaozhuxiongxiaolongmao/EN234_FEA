@@ -1,5 +1,5 @@
 !
-!    ABAQUS format UEL subroutine
+!    ABAQUS format UEL_3d subroutine
 !
 !    This file is compatible with both EN234_FEA and ABAQUS/Standard
 !
@@ -13,7 +13,8 @@
 !
 !=========================== ABAQUS format user element subroutine ===================
 
-      SUBROUTINE UEL(RHS,AMATRX,SVARS,ENERGY,NDOFEL,NRHS,NSVARS,
+      SUBROUTINE UEL_3d
+      (RHS,AMATRX,SVARS,ENERGY,NDOFEL,NRHS,NSVARS,
      1     PROPS,NPROPS,COORDS,MCRD,NNODE,U,DU,V,A,JTYPE,TIME,DTIME,
      2     KSTEP,KINC,JELEM,PARAMS,NDLOAD,JDLTYP,ADLMAG,PREDEF,NPREDF,
      3     LFLAGS,MLVARX,DDLMAG,MDLOAD,PNEWDT,JPROPS,NJPROP,PERIOD)
@@ -239,7 +240,7 @@
 
       return
 
-      END SUBROUTINE UEL
+      END SUBROUTINE UEL_3d
 
 
       subroutine abq_UEL_3D_integrationpoints(n_points, n_nodes, xi, w)

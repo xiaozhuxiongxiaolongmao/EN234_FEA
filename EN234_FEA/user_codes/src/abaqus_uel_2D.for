@@ -1,9 +1,9 @@
-!
+2
 !    ABAQUS format UEL subroutine
 !
 !    This file is compatible with both EN234_FEA and ABAQUS/Standard
 !
-!    The example implements a standard fully integrated 3D linear elastic continuum element
+!    The example implements a standard fully integrated 2D linear elastic continuum element
 !
 !    The file also contains the following subrouines:
 !          abq_UEL_2D_integrationpoints           - defines integration points for 2D continuum elements

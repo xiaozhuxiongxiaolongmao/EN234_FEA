@@ -215,11 +215,11 @@
         rhs_temp(1:2*NNODE) = rhs_temp(1:2*NNODE)
      1     - matmul(transpose(B(1:4,1:2*NNODE)),stress(1:4))*
      2                                          w(kint)*determinant
-        if (NSVARS>=n_points*4) then   ! Store stress at each integration point (if space was allocated to do so)
+        if (NSVARS>=n_points*4) then   
             SVARS(4*kint-3:4*kint) = stress(1:4)
         endif
          ENERGY(2) = ENERGY(2)
-     1   + 0.5D0*dot_product(stress,strain)*w(kint)*determinant   ! Store the elastic strain energy
+     1   + 0.5D0*dot_product(stress,strain)*w(kint)*determinant   
         end do
         AMATRX(1:2*NNODE,1:2*NNODE)=ktemp(1:2*NNODE,1:2*NNODE)
         RHS(1:2*NNODE,1)=rhs_temp(1:2*NNODE)
@@ -255,13 +255,13 @@
      2  matmul(D,B(1:4,1:2*NNODE+4)))*w(kint)*determinant
         end do 
         PNEWDT = 1.d0 
-        ! Second step, obtain kuu, kua, kau, kaa
+        ! obtain kuu, kua, kau, kaa
         kuu(1:2*NNODE,1:2*NNODE)=ktemp(1:2*NNODE,1:2*NNODE)
         kau(1:4,1:2*NNODE)=ktemp(2*NNODE+1:(2*NNODE+4),1:2*NNODE)
         kua(1:2*NNODE,1:4)=ktemp(1:2*NNODE,2*NNODE+1:2*NNODE+4)
         kaa(1:4,1:4)=ktemp(2*NNODE+1:2*NNODE+4,
      1  2*NNODE+1:2*NNODE+4)   
-        ! Third step, obtain alpha
+        !obtain alpha
         call abq_inverse_LU(kaa(1:4,1:4),
      1  kaainv(1:4,1:4),4)
         alpha(1:4)=(-1)*matmul(kaainv(1:4,1:4),
@@ -300,11 +300,11 @@
         rhs_temp(1:2*NNODE+4) = rhs_temp(1:2*NNODE+4)
      1  - matmul(transpose(B(1:4,1:2*NNODE+4)),stress(1:4))*
      2                                          w(kint)*determinant      
-        if (NSVARS>=n_points*4) then   ! Store stress at each integration point (if space was allocated to do so)
+        if (NSVARS>=n_points*4) then 
             SVARS(4*kint-3:4*kint) = stress(1:4)
         endif
         ENERGY(2) = ENERGY(2)
-     1   + 0.5D0*dot_product(stress,strain)*w(kint)*determinant   ! Store the elastic strain energy
+     1   + 0.5D0*dot_product(stress,strain)*w(kint)*determinant   
           end do    
         ru(1:2*NNODE)=rhs_temp(1:2*NNODE)
         ra(1:4)=rhs_temp(2*NNODE+1:2*NNODE+4)

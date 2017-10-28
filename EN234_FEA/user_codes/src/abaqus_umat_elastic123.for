@@ -231,7 +231,7 @@
 !      NOEL
 !           Element number.
 !
-!      NPT
+*!      NPT
 !           Integration point number.
 !
 !      LAYER
@@ -268,7 +268,7 @@
        edev(1:3) = STRAN(1:3)+DSTRAN(1:3) - evol/3.d0
        edev(4:6) = 0.5d0*(STRAN(4:6)+DSTRAN(4:6))
 
-       k = pt*(1.d0-2.d0*nu)(1.d0+e0)/(1.d0+nu)
+       k = pt*(1.d0-2.d0*nu)*(1.d0+e0)/(1.d0+nu)
   
        Kb = pt*(1.d0+e0)*exp(-(1.d0+e0)*evol/k)/(3*k)-2.d0*G/3.d0
  

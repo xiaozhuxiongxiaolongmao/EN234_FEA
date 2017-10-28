@@ -47,14 +47,14 @@
 !         This array is passed in as the stress tensor at the beginning
 !         of the increment and must be updated in this routine to be the
 !         stress tensor at the end of the increment. If you specified
-!         initial stresses (“Initial conditions,” Section 19.2.1), this
+!         initial stresses (â€œInitial conditions,â€ Section 19.2.1), this
 !         array will contain the initial stresses at the start of the
 !         analysis. The size of this array depends on the value of NTENS
 !         as defined below. In finite-strain problems the stress tensor
 !         has already been rotated to account for rigid body motion in
 !         the increment before UMAT is called, so that only the corotational
 !         part of the stress integration should be done in UMAT. The
-!         measure of stress used is “true” (Cauchy) stress.
+!         measure of stress used is â€œtrueâ€ (Cauchy) stress.
 !
 !   NB      When used in ABAQUS with hybrid elements the stress array has different dimensions
 !           and additional variables must be defined.   See the ABAQUS manual for details.
@@ -64,11 +64,11 @@
 !         An array containing the solution-dependent state variables.
 !         These are passed in as the values at the beginning of the
 !         increment unless they are updated in user subroutines USDFLD
-!        (“USDFLD,” Section 25.2.39) or UEXPAN (“UEXPAN,” Section 25.2.20),
+!        (â€œUSDFLD,â€ Section 25.2.39) or UEXPAN (â€œUEXPAN,â€ Section 25.2.20),
 !        in which case the updated values are passed in. In all cases
 !         STATEV must be returned as the values at the end of the increment.
 !         The size of the array is defined as described in
-!        “Allocating space” in “User subroutines: overview,” Section 25.1.1.
+!        â€œAllocating spaceâ€ in â€œUser subroutines: overview,â€ Section 25.1.1.
 !
 !         In finite-strain problems any vector-valued or tensor-valued
 !         state variables must be rotated to account for rigid body
@@ -78,7 +78,7 @@
 !
 !      SSE, SPD, SCD
 !         Specific elastic strain energy, plastic dissipation, and
-!         “creep” dissipation, respectively. These are passed in as
+!         â€œcreepâ€ dissipation, respectively. These are passed in as
 !         the values at the start of the increment and should be
 !         updated to the corresponding specific energy values at
 !         the end of the increment. They have no effect on the solution,
@@ -107,19 +107,19 @@
 !        algorithms in ABAQUS/Standard (if automatic time incrementation is chosen).
 !        For a quasi-static procedure the automatic time stepping that ABAQUS/Standard
 !        uses, which is based on techniques for integrating standard creep laws
-!        (see “Quasi-static analysis,” Section 6.2.5), cannot be controlled from within
+!        (see â€œQuasi-static analysis,â€ Section 6.2.5), cannot be controlled from within
 !        the UMAT subroutine.
 !        PNEWDT is set to a large value before each call to UMAT.
 !        If PNEWDT is redefined to be less than 1.0, ABAQUS/Standard must abandon the
 !        time increment and attempt it again with a smaller time increment. The
 !        suggested new time increment provided to the automatic time integration
-!        algorithms is PNEWDT × DTIME, where the PNEWDT used is the minimum value
+!        algorithms is PNEWDT Ã— DTIME, where the PNEWDT used is the minimum value
 !        for all calls to user subroutines that allow redefinition of PNEWDT for this
 !        iteration.
 !        If PNEWDT is given a value that is greater than 1.0 for all calls to user
 !        subroutines for this iteration and the increment converges in this iteration,
 !        ABAQUS/Standard may increase the time increment. The suggested new time increment
-!        provided to the automatic time integration algorithms is PNEWDT × DTIME, where
+!        provided to the automatic time integration algorithms is PNEWDT Ã— DTIME, where
 !        the PNEWDT used is the minimum value for all calls to user subroutines for
 !        this iteration.
 !        If automatic time incrementation is not selected in the analysis procedure,
@@ -134,7 +134,7 @@
 !         strains passed into UMAT are the mechanical strains only (that is, the
 !         thermal strains computed based upon the thermal expansion coefficient have
 !         been subtracted from the total strains). These strains are available for output
-!         as the “elastic” strains.
+!         as the â€œelasticâ€ strains.
 !
 !         In finite-strain problems the strain components have been rotated to account for
 !         rigid body motion in the increment before UMAT is called and are approximations
@@ -168,7 +168,7 @@
 !        Array of increments of predefined field variables.
 !
 !      CMNAME
-!        User-defined material name, left justified. Some internal material models are given names starting with the “ABQ_” character string. To avoid conflict, you should not use “ABQ_” as the leading string for CMNAME.
+!        User-defined material name, left justified. Some internal material models are given names starting with the â€œABQ_â€ character string. To avoid conflict, you should not use â€œABQ_â€ as the leading string for CMNAME.
 !
 !      NDI
 !        Number of direct stress components at this point.
@@ -181,8 +181,8 @@
 !
 !      NSTATV
 !         Number of solution-dependent state variables that are associated with
-!         this material type (defined as described in “Allocating space” in “User
-!         subroutines: overview,” Section 25.1.1).
+!         this material type (defined as described in â€œAllocating spaceâ€ in â€œUser
+!         subroutines: overview,â€ Section 25.1.1).
 !
 !      PROPS(NPROPS)
 !         User-specified array of material constants associated with this user material.
@@ -193,7 +193,7 @@
 !      COORDS
 !         An array containing the coordinates of this point. These are the current
 !         coordinates if geometric nonlinearity is accounted for during the step
-!         (see “Procedures: overview,” Section 6.1.1); otherwise, the array contains
+!         (see â€œProcedures: overview,â€ Section 6.1.1); otherwise, the array contains
 !         the original coordinates of the point.
 !
 !     DROT(3,3)

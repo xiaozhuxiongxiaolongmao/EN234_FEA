@@ -86,8 +86,8 @@ program en234fea
 
 !  HW5  Cantilever beam to test incompatible mode elements
 
-   infil = 'input_files/Abaqus_uel_cantilever.in'
-   outfil = 'Output_files/Abaqus_uel_cantilever.out'
+!   infil = 'input_files/Abaqus_uel_cantilever.in'
+!   outfil = 'Output_files/Abaqus_uel_cantilever.out'
 
 !  HW6  Porous elasticity UMAT
 
@@ -110,8 +110,8 @@ program en234fea
 !   infil = 'input_files/Abaqus_uel_phasefield_coarse.in'
 !   outfil = 'Output_files/Abaqus_uel_phasefield_coarse.out'
 
-!   infil = 'input_files/Abaqus_uel_phasefield_fine.in'
-!   outfil = 'Output_files/Abaqus_uel_phasefield_fine.out'
+   infil = 'input_files/Abaqus_uel_phasefield_fine.in'
+   outfil = 'Output_files/Abaqus_uel_phasefield_fine.out'
 
 
 !   Homework 9 - McCormick model with 1 element

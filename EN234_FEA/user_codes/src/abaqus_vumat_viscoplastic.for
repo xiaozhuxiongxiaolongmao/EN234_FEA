@@ -168,13 +168,13 @@
      1    eplas)/e0)**m)/S - H*(1.d0-exp(-(((omega+deplas)*ta*exp(
      2    -deplas/omega)+omega*dt)/td)**alpha))-log(deplas/(dt*edot0))
         
-        f1 = sestar/S - E*1.001*deplas/(2.d0*(1.d0+xnu)*S) - 
-     1   (Y*(1.d0+(1.001*deplas+
-     1    eplas)/e0)**m)/S - H*(1.d0-exp(-(((omega+1.001*deplas)*ta
-     1   *exp(-1.001*deplas/omega)+omega*dt)/td)**alpha))
-     1   -log(1.001*deplas/(dt*edot0))
+        f1 = sestar/S - E*1.000001*deplas/(2.d0*(1.d0+xnu)*S) - 
+     1   (Y*(1.d0+(1.000001*deplas+
+     1    eplas)/e0)**m)/S - H*(1.d0-exp(-(((omega+1.000001*deplas)*ta
+     1   *exp(-1.000001*deplas/omega)+omega*dt)/td)**alpha))
+     1   -log(1.000001*deplas/(dt*edot0))
 
-         p = (f1-f)/(0.001*deplas)
+         p = (f1-f)/(0.000001*deplas)
          deplas_new = deplas - f/p
          if (deplas_new<0.d0) then
             deplas = deplas/10.d0

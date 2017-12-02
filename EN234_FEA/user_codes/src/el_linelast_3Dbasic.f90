@@ -1,9 +1,9 @@
-!     Subroutines for basic 3D linear elastic elements 
+!     Subroutines for basic2D linear elastic elements 
 
 
 
 !==========================SUBROUTINE el_linelast_3dbasic ==============================
-subroutine el_linelast_3dbasic(lmn, element_identifier, n_nodes, node_property_list, &           ! Input variables
+subroutine el_linelast_2dbasic(lmn, element_identifier, n_nodes, node_property_list, &           ! Input variables
     n_properties, element_properties, n_int_properties, int_element_properties, &                ! Input variables
     element_coords, length_coord_array, &                                                        ! Input variables
     dof_increment, dof_total, length_dof_array, &                                                ! Input variables
@@ -13,11 +13,11 @@ subroutine el_linelast_3dbasic(lmn, element_identifier, n_nodes, node_property_l
     use ParamIO
     !  use Globals, only: TIME,DTIME  For a time dependent problem uncomment this line to access the time increment and total time
     use Mesh, only : node
-    use Element_Utilities, only : N => shape_functions_3D
-    use Element_Utilities, only : dNdxi => shape_function_derivatives_3D
-    use Element_Utilities, only:  dNdx => shape_function_spatial_derivatives_3D
-    use Element_Utilities, only : xi => integrationpoints_3D, w => integrationweights_3D
-    use Element_Utilities, only : dxdxi => jacobian_3D
+    use Element_Utilities, only : N => shape_functions_2D
+    use Element_Utilities, only : dNdxi => shape_function_derivatives_2D
+    use Element_Utilities, only:  dNdx => shape_function_spatial_derivatives_2D
+    use Element_Utilities, only : xi => integrationpoints_2D, w => integrationweights_2D
+    use Element_Utilities, only : dxdxi => jacobian_2D
     use Element_Utilities, only : initialize_integration_points
     use Element_Utilities, only : calculate_shapefunctions
     use Element_Utilities, only : invert_small
@@ -59,15 +59,18 @@ subroutine el_linelast_3dbasic(lmn, element_identifier, n_nodes, node_property_l
           
 
     ! Local Variables
-    integer      :: n_points,kint
+    integer      :: n_points,kint,n_snodes
 
-    real (prec)  ::  strain(6), dstrain(6)             ! Strain vector contains [e11, e22, e33, 2e12, 2e13, 2e23]
-    real (prec)  ::  stress(6)                         ! Stress vector contains [s11, s22, s33, s12, s13, s23]
-    real (prec)  ::  D(6,6)                            ! stress = D*(strain+dstrain)  (NOTE FACTOR OF 2 in shear strain)
-    real (prec)  ::  B(6,length_dof_array)             ! strain = B*(dof_total+dof_increment)
-    real (prec)  ::  dxidx(3,3), determinant           ! Jacobian inverse and determinant
-    real (prec)  ::  x(3,length_coord_array/3)         ! Re-shaped coordinate array x(i,a) is ith coord of ath node
-    real (prec)  :: E, xnu, D44, D11, D12              ! Material properties
+    real (prec)  ::  strain(3), dstrain(3)             ! Strain vector contains [e11, e22, e33, 2e12, 2e13, 2e23]
+    real (prec)  ::  stress(2)                         ! Stress vector contains [s11, s22, s33, s12, s13, s23]
+    real (prec)  ::  D(2,2)                            ! stress = D*(strain+dstrain)  (NOTE FACTOR OF 2 in shear strain)
+    real (prec)  ::  B(3,8),B_1(2,6)            ! strain = B*(dof_total+dof_increment)
+    real (prec)  ::  dxidx(2,2), determinant           ! Jacobian inverse and determinant
+    real (prec)  ::  x(2,length_coord_array/2)         ! Re-shaped coordinate array x(i,a) is ith coord of ath node
+    real (prec)  ::  h,width,E,xnu            ! Material properties
+    real (prec)  ::  T(8,6),theta1,theta2,x_s(2,4)
+    real (prec)  ::  e1(2,1),e2(2,1),R(2,3)
+    
     !
     !     Subroutine to compute element stiffness matrix and residual force vector for 3D linear elastic elements
     !     El props are:
@@ -78,12 +81,14 @@ subroutine el_linelast_3dbasic(lmn, element_identifier, n_nodes, node_property_l
 
     fail = .false.
     
-    x = reshape(element_coords,(/3,length_coord_array/3/))
+    x = reshape(element_coords,(/2,length_coord_array/2/))
 
-    if (n_nodes == 4) n_points = 1
-    if (n_nodes == 10) n_points = 4
-    if (n_nodes == 8) n_points = 8
-    if (n_nodes == 20) n_points = 27
+   
+
+                   
+        n_snodes = 4 
+        
+   
 
     call initialize_integration_points(n_points, n_nodes, xi, w)
 
@@ -91,49 +96,106 @@ subroutine el_linelast_3dbasic(lmn, element_identifier, n_nodes, node_property_l
     element_stiffness = 0.d0
 	
     D = 0.d0
-    E = element_properties(1)
-    xnu = element_properties(2)
-    d44 = 0.5D0*E/(1+xnu) 
-    d11 = (1.D0-xnu)*E/( (1+xnu)*(1-2.D0*xnu) )
-    d12 = xnu*E/( (1+xnu)*(1-2.D0*xnu) )
-    D(1:3,1:3) = d12
-    D(1,1) = d11
-    D(2,2) = d11
-    D(3,3) = d11
-    D(4,4) = d44
-    D(5,5) = d44
-    D(6,6) = d44
+    h = element_properties(1)
+    w = element_properties(2)
+    E = element_properties(3)
+    xnu = element_properties(4)
+    
+    
+    D(1,1) = E
+    D(2,2) = 0.5d0*E/(1.d0+xnu)
   
-    !     --  Loop over integration points
-    do kint = 1, n_points
-        call calculate_shapefunctions(xi(1:3,kint),n_nodes,N,dNdxi)
-        dxdxi = matmul(x(1:3,1:n_nodes),dNdxi(1:n_nodes,1:3))
-        call invert_small(dxdxi,dxidx,determinant)
-        dNdx(1:n_nodes,1:3) = matmul(dNdxi(1:n_nodes,1:3),dxidx)
-        B = 0.d0
-        B(1,1:3*n_nodes-2:3) = dNdx(1:n_nodes,1)
-        B(2,2:3*n_nodes-1:3) = dNdx(1:n_nodes,2)
-        B(3,3:3*n_nodes:3)   = dNdx(1:n_nodes,3)
-        B(4,1:3*n_nodes-2:3) = dNdx(1:n_nodes,2)
-        B(4,2:3*n_nodes-1:3) = dNdx(1:n_nodes,1)
-        B(5,1:3*n_nodes-2:3) = dNdx(1:n_nodes,3)
-        B(5,3:3*n_nodes:3)   = dNdx(1:n_nodes,1)
-        B(6,2:3*n_nodes-1:3) = dNdx(1:n_nodes,3)
-        B(6,3:3*n_nodes:3)   = dNdx(1:n_nodes,2)
+  
+    T = 0.d0
+    x_s = 0.d0
+    theta1 = dof_total(3)+dof_increment(3)
+    theta2 = dof_total(6)+dof_increment(6)
+    x_s(1,4) = x(1,1)-0.5*h*sin(theta1)
+    x_s(1,1) = x(1,1)+0.5*h*sin(theta1)
+    x_s(1,3) = x(1,2)-0.5*h*sin(theta2)
+    x_s(1,2) = x(1,2)+0.5*h*sin(theta2)
+    x_s(2,4) = x(2,1)+0.5*h*cos(theta1)
+    x_s(2,1) = x(2,1)-0.5*h*cos(theta1)
+    x_s(2,3) = x(2,2)+0.5*h*cos(theta2)
+    x_s(2,2) = x(2,2)-0.5*h*cos(theta2)
+    
+    T(1,1) = 1.d0
+    T(2,2) = 1.d0
+    T(1,3) = x(2,1)-x_s(2,1)
+    T(2,3) = -x(1,1)+x_s(1,1)
+    T(3,4) = 1.d0
+    T(3,6) = x(2,2)-x_s(2,2)
+    T(4,5) = 1.d0
+    T(4,6) = x_s(1,2)-x(1,2)
+    T(5,4) = 1.d0
+    T(5,6) = x(2,2)-x_s(2,3) 
+    T(6,5) = 1.d0 
+    T(6,6) = x_s(1,2)-x(1,3)
+    T(7,1) = 1.d0
+    T(7,3) = x(2,1)-x_s(2,4)
+    T(8,2) = 1.d0
+    T(8,3) = -x(1,1)+x_s(1,4)
+    
+     n_points = 5 
+    do kint=1, n_points 
+       xi(1,kint)=0 
+       xi(2,kint)=-1.d0+0.5d0*(kint-1)
 
-        strain = matmul(B,dof_total)
-        dstrain = matmul(B,dof_increment)
+    end do 
+    
+   
+    !     --  Loop over integration points
+    do kint = 1,n_nodes
+        call calculate_shapefunctions(xi(1:2,kint),n_nodes,N,dNdxi)
+        dxdxi = matmul(x(1:2,1:n_nodes),dNdxi(1:n_nodes,1:2))
+        call invert_small(dxdxi,dxidx,determinant)
+        dNdx(1:n_nodes,1:2) = matmul(dNdxi(1:n_nodes,1:2),dxidx)
+        B = 0.d0
+        B(1,1:2*n_nodes-1:2) = dNdx(1:n_nodes,1)
+        B(2,2:2*n_nodes:2) = dNdx(1:n_nodes,2)
+        B(3,1:2*n_nodes-1:2)   = dNdx(1:n_nodes,2)
+        B(3,2:2*n_nodes:2) = dNdx(1:n_nodes,1)
+        
+        e1(1:2,1)=matmul(x_s(1:2,1:4),dNdxi(1:4,1))
+        e1=e1/(sqrt(e1(1,1)**2+e1(2,1)**2))
+        e2(2,1)=-e1(2,1)
+        e2(1,1)=e1(1,1) 
+        R=0.d0 
+        R(1,1)=e1(1,1)**2 
+        R(1,2)=e2(1,1)**2 
+        R(1,3)=e1(1,1)*e1(2,1) 
+        R(2,1)=2*e1(1,1)*e2(2,1) 
+        R(2,2)=2*e1(2,1)*e2(1,1) 
+        R(2,3)=(e1(1,1)*e2(1,1)+e1(2,1)*e2(2,1)) 
+        
+        
+
+
+        strain = matmul(B,matmul(T,dof_total))
+        dstrain = matmul(B,matmul(T,dof_increment))
       
-        stress = matmul(D,strain+dstrain)
-        element_residual(1:3*n_nodes) = element_residual(1:3*n_nodes) - matmul(transpose(B),stress)*w(kint)*determinant
+        stress = matmul(D,matmul(R,strain+dstrain))
+        B_1 = matmul(R,matmul(B,T)) 
+
+        if( kint==1.OR.kint==5) then 
+        
+        element_residual(1:3*n_nodes) = element_residual(1:3*n_nodes) - &
+       matmul(transpose(B_1),stress)*determinant
 
         element_stiffness(1:3*n_nodes,1:3*n_nodes) = element_stiffness(1:3*n_nodes,1:3*n_nodes) &
-            + matmul(transpose(B(1:6,1:3*n_nodes)),matmul(D,B(1:6,1:3*n_nodes)))*w(kint)*determinant
+            + matmul(transpose(B_1),matmul(D,B_1))*determinant
+        else
+             element_residual(1:3*n_nodes) = element_residual(1:3*n_nodes) - &
+            2.d0*matmul(transpose(B_1),stress)*determinant
 
+        element_stiffness(1:3*n_nodes,1:3*n_nodes) = element_stiffness(1:3*n_nodes,1:3*n_nodes) - &
+            2.d0*matmul(transpose(B_1),matmul(D,B_1))*determinant
+
+    end if
     end do
   
     return
-end subroutine el_linelast_3dbasic
+end subroutine el_linelast_2dbasic
 
 
 !==========================SUBROUTINE el_linelast_3dbasic_dynamic ==============================
